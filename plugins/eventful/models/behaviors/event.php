@@ -81,11 +81,11 @@ class EventBehavior extends ModelBehavior {
 	 */
 	function beforeFind (&$model, $query) {
 		if ($this->settings[$model->alias]['triggerDefaults']) {
-			$this->dispatchEvent($model, 'beforeFind', array('model' => $model, 'query' => $query), false);
+			$this->dispatchEvent($model, 'beforeFind', array('query' => $query), false);
 		}
 	}
 	/**
-	 * After find callback. Can be used to modify any results returned by find and findAll.
+	 * After find callback.
 	 *
 	 * @param object $model Model using this behavior
 	 * @param mixed $results The results of the find operation
@@ -95,7 +95,7 @@ class EventBehavior extends ModelBehavior {
 	 */
 	function afterFind ($model, $results, $primary) {
 		if ($this->settings[$model->alias]['triggerDefaults']) {
-			$this->dispatchEvent($model, 'afterFind', array('model' => $model, 'results' => $results, 'primary' => $primary));
+			$this->dispatchEvent($model, 'afterFind', array('results' => $results, 'primary' => $primary));
 		}
 	}
 	/**
@@ -107,7 +107,7 @@ class EventBehavior extends ModelBehavior {
 	 */
 	function beforeValidate (&$model) {
 		if ($this->settings[$model->alias]['triggerDefaults']) {
-			$this->dispatchEvent($model, 'beforeValidate', array('model' => $model));
+			$this->dispatchEvent($model, 'beforeValidate');
 		}
 	}
 	/**
@@ -119,7 +119,7 @@ class EventBehavior extends ModelBehavior {
 	 */
 	function beforeSave (&$model) {
 		if ($this->settings[$model->alias]['triggerDefaults']) {
-			$this->dispatchEvent($model, 'beforeSave', array('model' => $model));
+			$this->dispatchEvent($model, 'beforeSave');
 		}
 	}
 	/**
@@ -131,7 +131,7 @@ class EventBehavior extends ModelBehavior {
 	 */
 	function afterSave (&$model, $created) {
 		if ($this->settings[$model->alias]['triggerDefaults']) {
-			$this->dispatchEvent($model, 'afterSave', array('model' => $model, 'created' => $created));
+			$this->dispatchEvent($model, 'afterSave', array('created' => $created));
 		}
 	}
 	/**
@@ -144,7 +144,7 @@ class EventBehavior extends ModelBehavior {
 	 */
 	function beforeDelete (&$model, $cascade = true) {
 		if ($this->settings[$model->alias]['triggerDefaults']) {
-			$this->dispatchEvent($model, 'beforeDelete', array('model' => $model, 'cascade' => $cascade));
+			$this->dispatchEvent($model, 'beforeDelete', array('cascade' => $cascade));
 		}
 	}
 	/**
@@ -155,7 +155,7 @@ class EventBehavior extends ModelBehavior {
 	 */
 	function afterDelete (&$model) {
 		if ($this->settings[$model->alias]['triggerDefaults']) {
-			$this->dispatchEvent($model, 'afterDelete', array('model' => $model));
+			$this->dispatchEvent($model, 'afterDelete');
 		}
 	}
 	/**
@@ -167,9 +167,8 @@ class EventBehavior extends ModelBehavior {
 	 */
 	function onError (&$model, $error) {
 		if ($this->settings[$model->alias]['triggerDefaults']) {
-			$this->dispatchEvent($model, 'error', array('model' => $model, 'error' => $error));
+			$this->dispatchEvent($model, 'datasourceError', array('error' => $error));
 		}
 	}
 
 }
-?>

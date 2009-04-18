@@ -33,11 +33,13 @@ class EventDispatcher {
 	 *
 	 * @param object $event Instance of Event object
 	 */
-	public function dispatchEvent($event) {
+	public function dispatchEvent($event, $global = true) {
+		
 		$result = array();
-		$eventType = low($event->type);
-		if (!array_key_exists($eventType, $this->events)) return false;
-		foreach ((array) $this->events[$eventType] as $listener) {
+		$eventName = low($event->type);
+				
+		if (!array_key_exists($eventName, $this->events)) return false;
+		foreach ((array) $this->events[$eventName] as $listener) {
 			if (is_callable($listener)) {
 				$return = call_user_func($listener, $event);
 				$result[] = array(
@@ -92,6 +94,8 @@ class EventDispatcher {
 	 * @param mixed $listener function/method name
 	 */
 	public function addEventListener($event, $listener) {
+		
+		
 		$this->events[low($event)][] = $listener;
 	}
 		
@@ -105,6 +109,3 @@ class EventDispatcher {
 		$this->events[low($event)] = array_remove($this->events[low($event)], $listener);
 	}
 }
-
-
-

@@ -106,6 +106,30 @@ function index() {
   pr ($result);
 }
 
+Model Events:
+--------------------------------------------------------------------------------------
+Basicly everything from above applies. Filename for user.php would be user_events.php.
+There are default events that are fired from within the behavior. 
+
+- onBeforeFind (available infos: 'query')
+- onAfterFind (available infos: 'results', 'primary');
+- onBeforeValidate (available infos: )
+- onBeforeSave (available infos: )
+- onAfterSave (available infos: 'created')
+- onBeforeDelete (available infos: 'cascade')
+- onAfterDelete (available infos: 'created')
+- onDatasourceError (available infos: 'error')
+
+The triggering of the default events can be disabled. 
+
+var $actsAs = array(
+  'Eventful.Event' => array(
+		'triggerDefaults' => false
+	)
+);
+
+Everything else is up to you.
+
 --------------------------------------------------------------------------------------
 
 That should get you started.
