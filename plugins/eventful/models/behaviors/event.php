@@ -2,11 +2,10 @@
 /**
  * Eventful CakePHP
  *
- * Use the method dispatchEvent() to send a event notification to your ModelEvents class.
+ * Use the dispatch() method
  *
  * OPTIONS:
  * - triggerDefaults: (BOOL) Auto-dispatch beforeSave/afterDelete/beforeFind etc..
- * - pluginDir: (STRING) Directory. Make sure you've created "events"-dir in the plugin dir
  * 
  * @author Kjell Bublitz <kjell@growinthings.de>
  * @copyright 2008-2009 (c) Kjell Bublitz
@@ -25,54 +24,21 @@
 class EventBehavior extends ModelBehavior {
 	
 	/**
-	 * Defaults
+	 * Array with loaded event listener classes
+	 *
+	 * @var array
 	 */
-	public $defaultConfig = array(
-		'triggerDefaults' => true, 
-		'pluginDir' => ''
-	);
+	public $listeners = array();	
 	
 	/**
-	 * Add a Event Listener to this model class
+	 * Default Settings
 	 * 
-	 * @param object $model
-	 * @access public
+	 * @var array
 	 */
-	function addListener(&$model) {
-		$plugin = $this->settings[$model->alias]['pluginDir'];
-		$type = (!empty($plugin) ? 'plugin' : 'app'); 
-		
-		$events = CakeEvents::getInstance();
-		$model->listenerClass = $model->name . 'Events';
-		$model->hasListener = $events->addListener($model->listenerClass, $type, $plugin);
-	}
-	/**
-	 * Unregisters a class listener
-	 *
-	 * @param object $model
-	 */
-	function removeListener(&$model) {
-		if (!$model->hasListener) return false;
-		$events = CakeEvents::getInstance();
-		$listener = $events->getListener($model->listenerClass);
-		$model->hasListener = false;
-		return $events->removeListener($listener);
-	}
-	/**
-	 * Wrapper for default event dispatching
-	 * 
-	 * @param object $model
-	 * @param string $event
-	 * @param array $data (optional)
-	 * @access public
-	 */
-	function dispatchEvent ($model, $event, $data = array()) {
-		if (! $model->hasListener) return false;
-		$events = CakeEvents::getInstance();
-		return $events->dispatchEvent($event, am($data, array(
-			'Model' => $model
-		)));
-	}
+	public $defaultConfig = array(
+		'triggerDefaults' => true
+	);
+	
 	/**
 	 * Setup this behavior with the specified configuration settings.
 	 *
@@ -81,21 +47,30 @@ class EventBehavior extends ModelBehavior {
 	 * @access public
 	 */
 	function setup(&$model, $config = array()) {
+		App::import('Vendor', 'Eventful.Startup'); // bootstrap
+		
 		$this->settings[$model->alias] = am($this->defaultConfig, $config);
-		$this->addListener($model);
+		$this->CakeEvents = CakeEvents::getInstance();		
+		
+		$listeners = $this->CakeEvents->loadListeners('models');
+		foreach ($listeners as $class => $params) {	extract($params);
+			$this->listeners[$class] = $this->CakeEvents->addListener($className, $eventType, $pluginDir);
+		}
 	}
+	
 	/**
-	 * Clean up any initialization this behavior has done on a model.  Called when a behavior is dynamically
-	 * detached from a model using Model::detach().
-	 *
-	 * @param object $model Model using this behavior
+	 * Wrapper for default event dispatching
+	 * 
+	 * @param object $model
+	 * @param string $event
+	 * @param array $data (optional)
 	 * @access public
-	 * @see BehaviorCollection::detach()
 	 */
-	function cleanup (&$model) {
-		parent::cleanup($model);
-		$this->removeListener($model);
+	function dispatchEvent($model, $event, $data = array(), $global = true) {
+		$cake_events = CakeEvents::getInstance();
+		return $cake_events->dispatchEvent($event, am($data, array('Model' => $model)), $global);
 	}
+
 	/**
 	 * Before find callback
 	 *
@@ -106,7 +81,7 @@ class EventBehavior extends ModelBehavior {
 	 */
 	function beforeFind (&$model, $query) {
 		if ($this->settings[$model->alias]['triggerDefaults']) {
-			$this->dispatchEvent($model, 'beforeFind', array('model' => $model, 'query' => $query));
+			$this->dispatchEvent($model, 'beforeFind', array('model' => $model, 'query' => $query), false);
 		}
 	}
 	/**

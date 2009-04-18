@@ -30,6 +30,13 @@ class CakeEvents extends Object {
 	private $listeners = array();
 	
 	/**
+	 * List of not existing event class filepaths
+	 *
+	 * @var unknown_type
+	 */
+	private $notFound = array();
+	
+	/**
 	 * Singleton Class
 	 *
 	 * @return object
@@ -124,15 +131,17 @@ class CakeEvents extends Object {
 			# App::import('File', PLUGINS. $plugin .DS. $plugin . '_app_model_events.php');		
 		}
 		
-		$listener = new $eventClassName($eventClassName, array(
-			'type' => $type,
-			'plugin' => $plugin
-		));
+		if (in_array($eventClassName, array_keys($this->listeners))) {
+			return $this->listeners[$eventClassName][2];
+		}		
 		
+		// create instance and add as listener class
+		$listener = new $eventClassName($eventClassName, array('type' => $type, 'plugin' => $plugin));
 		if ($this->EventDispatcher->addListener($listener)) {
 			$this->listeners[$listener->name] = array($listener, $listener->name, $listener->params);
 			return $listener->params;
 		}
+		
 		return false;
 	}
 	
@@ -143,8 +152,8 @@ class CakeEvents extends Object {
 	 * @param string $data Event Data (optional)
 	 * @return array result
 	 */
-	public function dispatchEvent($name, $data = array()) {
-		return $this->EventDispatcher->dispatchEvent(new Event($name, $data));
+	public function dispatchEvent($name, $data = array(), $global = true) {
+		return $this->EventDispatcher->dispatchEvent(new Event($name, $data), $global);
 	}
 	
     /**
@@ -179,4 +188,13 @@ class CakeEvents extends Object {
 		return $this->listeners;
 	}
 	
+	/**
+	 * Getter: $notFound
+	 *
+	 * @return unknown
+	 */	
+	public function getNotFound() {
+		
+		return $this->notFound;
+	}	
 }

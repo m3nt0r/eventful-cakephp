@@ -22,12 +22,10 @@
 class EventComponent extends Object {
 	
 	/**
-	 * Default state is "no listener available"
+	 * Array with loaded event listener classes
 	 *
-	 * @var unknown_type
+	 * @var array
 	 */
-	public $Listener = false;
-	
 	public $listeners = array();
 	
 	/**
