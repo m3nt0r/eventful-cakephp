@@ -43,7 +43,6 @@ class EventComponent extends Object {
 		$this->listenerClass = $listenerClass;
 		$this->Listener = $this->CakeEvents->addListener($listenerClass, $listenerType, $controller->plugin);
 		
-		pr ($this->Listener);
 		$this->Controller = $controller;
 	}
 	
