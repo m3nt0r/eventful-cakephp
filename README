@@ -12,7 +12,6 @@ Installation:
 
 Current Version:
 ----------------------------------------------------------------------------------------
-- Behavior not tested.. should work, copied from draft.
 - Need to add default triggers for controller (onBeforeFilter, etc.)
 
 How to use:
