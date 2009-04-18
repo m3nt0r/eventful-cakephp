@@ -8,6 +8,7 @@ Installation:
 - Put "plugins/eventful" to APP.PLUGINS
 - Add "Eventful.Event" to AppController::$components <- ControllerEvents, Bootstrap
 - Optional: Add "Eventful.Event" to AppModel::$actsAs array <- ModelEvents
+- Optional: Copy "/app/events" layout into your plugin to dispatch events to plugins
 
 Current Version:
 ----------------------------------------------------------------------------------------
