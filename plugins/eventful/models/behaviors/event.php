@@ -66,9 +66,9 @@ class EventBehavior extends ModelBehavior {
 	 * @param array $data (optional)
 	 * @access public
 	 */
-	function dispatchEvent($model, $event, $data = array(), $global = true) {
+	function dispatchEvent($model, $event, $data = array()) {
 		$cake_events = CakeEvents::getInstance();
-		return $cake_events->dispatchEvent($event, am($data, array('Model' => $model)), $global);
+		return $cake_events->dispatchEvent($event, am($data, array('Model' => $model)));
 	}
 
 	/**
@@ -81,7 +81,7 @@ class EventBehavior extends ModelBehavior {
 	 */
 	function beforeFind (&$model, $query) {
 		if ($this->settings[$model->alias]['triggerDefaults']) {
-			$this->dispatchEvent($model, 'beforeFind', array('query' => $query), false);
+			$this->dispatchEvent($model, 'beforeFind', array('query' => $query));
 		}
 	}
 	/**
