@@ -1,0 +1,78 @@
+EVENTFUL CAKEPHP
+==============================
+Event System for CakePHP
+
+Installation:
+----------------------------------------------------------------------------------------
+- Put "events" to APP
+- Put "plugins/eventful" to APP.PLUGINS
+- Add "Eventful.Event" to AppController::$components
+- Optional: Add "Eventful.Event" to AppModel::$actsAs array
+
+Current Version:
+----------------------------------------------------------------------------------------
+- Behavior not tested.. should work, copied from draft.
+- Need to add default triggers for controller (onBeforeFilter, etc.)
+
+How to use:
+----------------------------------------------------------------------------------------
+Listener classes need to have the same name as the controller file + "_events" at
+the end. So if you want to write event handlers for "movies_controller.php" you need 
+to create a file called "movies_controller_events.php" in the folder /app/events/controllers/.
+Same goes for models. The matching "user.php" event class filename is "user_events.php".
+
+Note: Just because you are dispatching events from one controller it is not required 
+that the listener class file exists. 
+
+Withing the listener classes you need to prefix your event handler methods with 
+the "on" keyword. If you dispatch a event called "userSignUp" like so:
+
+<?php 
+	$this->Event->dispatch('userSignUp') 
+?>
+
+The method within the class needs to be named "onUserSignUp". More specific:
+
+<?php
+	// users_controller_events.php
+	class UsersControllerEvents extends AppControllerEvents {
+	
+		function onUserSignUp($event) {
+			// ... do stuff.
+		}	
+	}
+?>
+
+As you can see, we extend the AppControllerEvents class. This class is of same 
+nature as the app_controller.php. It is the default base class for all events. 
+We also have AppModelEvents for model events.
+
+You can overwrite the AppControllerEvents class by creating the file
+"app_controller_events.php" in the APP folder. Same spot as app_helper.php, etc.
+But that's optional... a good place for shared events.
+
+About the "$event" parameter. Passed to all handlers by default. If the event 
+is a controller event you can access the controller object at $event->Controller.
+If the event is a model event you can access the model at $event->Model.
+
+There is also a optional $data parameter in the EventComponent dispatch method.
+
+<?php
+	$this->Event->dispatch('userSignUp', array('hello' => 'kitty'));
+?>
+
+The event handler method can access the value of "hello" at the event object
+
+<?php
+	class UsersControllerEvents extends AppControllerEvents {
+	
+		function onUserSignUp($event) {
+			return $event->hello; //=> kitty
+		}
+	}
+?>
+
+That should get you started.
+More to follow... 
+
+
