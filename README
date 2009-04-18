@@ -6,8 +6,8 @@ Installation:
 ----------------------------------------------------------------------------------------
 - Put "events" to APP
 - Put "plugins/eventful" to APP.PLUGINS
-- Add "Eventful.Event" to AppController::$components
-- Optional: Add "Eventful.Event" to AppModel::$actsAs array
+- Add "Eventful.Event" to AppController::$components <- ControllerEvents, Bootstrap
+- Optional: Add "Eventful.Event" to AppModel::$actsAs array <- ModelEvents
 
 Current Version:
 ----------------------------------------------------------------------------------------
@@ -21,8 +21,12 @@ the end. So if you want to write event handlers for "movies_controller.php" you 
 to create a file called "movies_controller_events.php" in the folder /app/events/controllers/.
 Same goes for models. The matching "user.php" event class filename is "user_events.php".
 
+Since it all follows the cake conventions event listener classes within plugins need to 
+prefix the plugin name. If you have a "pizza" plugin the name for a controller event 
+listener class should be: "pizza_orders_controller_events.php"
+
 Note: Just because you are dispatching events from one controller it is not required 
-that the listener class file exists. 
+that the listener class file exists.  
 
 Withing the listener classes you need to prefix your event handler methods with 
 the "on" keyword. If you dispatch a event called "userSignUp" like so:
@@ -37,7 +41,7 @@ The method within the class needs to be named "onUserSignUp". More specific:
 	// users_controller_events.php
 	class UsersControllerEvents extends AppControllerEvents {
 	
-		function onUserSignUp($event) {
+		function onUserSignUp($event) { 
 			// ... do stuff.
 		}	
 	}
@@ -71,6 +75,37 @@ The event handler method can access the value of "hello" at the event object
 		}
 	}
 ?>
+
+Trigger all Events
+----------------------------------------------------------------------------------------
+If you specify the same event listener method in other listener classes the event dispatch
+will fire them too.
+
+Fire -> "usersIndex" in any controller
+Execs -> *.*ControllerEvents::onUsersIndex()
+
+Be careful about how you name the events.
+
+Check out this output: 
+
+Array
+(
+    [MoviesControllerEvents] => I am the MoviesController Event Listener!
+    [UsersControllerEvents] => I am the UsersController Event Listener!
+    [PizzaMoviesControllerEvents] => I am the Pizza.MoviesController Event Listener!
+)
+
+This array is the default return format from the dispatch method. 
+That way you can sort the returns from all events as you need them
+
+To get the above in my example application i wrote in my action:
+
+function index() {
+  $result = $this->Event->dispatch('usersIndex');
+  pr ($result);
+}
+
+--------------------------------------------------------------------------------------
 
 That should get you started.
 More to follow... 

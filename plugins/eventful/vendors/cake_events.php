@@ -30,13 +30,6 @@ class CakeEvents extends Object {
 	private $listeners = array();
 	
 	/**
-	 * List of not existing event class filepaths
-	 *
-	 * @var unknown_type
-	 */
-	private $notFound = array();
-	
-	/**
 	 * Singleton Class
 	 *
 	 * @return object
@@ -51,6 +44,68 @@ class CakeEvents extends Object {
 		$instance[0]->EventDispatcher = ClassRegistry::getObject('event_dispatcher');
 		return $instance[0];
 	}
+	
+	public static function file2class($filename) {
+		return Inflector::camelize(r('.php', '', $filename));
+	}
+	
+	public function loadListeners($dir = 'controllers') {
+		$loadable = array();
+		$filePaths = $this->eventFilePaths($dir);
+		
+		foreach ($filePaths as $className => $classFilePath) {
+			if (App::import('File', $className, array('file' => $classFilePath))) {
+				
+				$eventType = 'app';
+				$pluginDir = null;
+				
+				$filePathArray = explode(DS, $classFilePath);
+				if ($filePathKey = array_search('plugins', $filePathArray)) {
+					$eventType = 'plugin';
+					$pluginDir = $filePathArray[$filePathKey+1];
+				}
+				
+				$loadable[$className] = compact('className', 'eventType', 'pluginDir', 'classFilePath');
+
+			} else {
+				unset($filePaths[$i]);
+			}
+		}
+		Cache::write('event_class_paths', $filePaths);
+
+		return $loadable;
+	}
+	
+	
+	public function eventFilePaths($dir = 'controllers') {
+		App::import('Core', 'Folder'); 
+		
+		$eventFilePaths = array();
+		
+		// Lookup APP events
+		$events = new Folder(EVENTS . $dir);
+		list($folders, $files) = $events->ls();
+		foreach ($files as $listenerClassFile)
+			$eventFilePaths[self::file2class($listenerClassFile)] = $events->path . DS . $listenerClassFile;
+		
+		// Lookup PLUGIN events
+		$plugins = new Folder(PLUGINS);
+		list($folders, $files) = $plugins->ls();
+		if (count($folders) > 1) {
+			foreach ($folders as $pluginsFolder) {
+				if ($pluginsFolder == 'eventful') continue; 
+				
+				$pluginEvents = new Folder(PLUGINS . $pluginsFolder . DS . EVENTS_DIR . DS . $dir);
+				list($folders, $files) = $pluginEvents->ls();
+				
+				foreach ($files as $listenerClassFile)
+					$eventFilePaths[self::file2class($listenerClassFile)] = $pluginEvents->path . DS . $listenerClassFile;
+			}
+		}
+		
+		return $eventFilePaths;
+	}
+	
 		
 	/**
 	 * Load and add a listener
@@ -63,60 +118,15 @@ class CakeEvents extends Object {
 	public function addListener($eventClassName, $type = 'app', $plugin = '') {
 
 		if ($type == 'plugin' && empty($plugin)) return false;
-		$classPathsCache = Cache::read('event_class_paths');
-		$classPaths = $classPathsCache ? $classPathsCache : array();
 		
-		if (in_array($eventClassName, array_keys($classPaths))) {
-			
-			$eventClassPath = $classPaths[$eventClassName];
-			
-		} else { // not in cache
-			
-			$eventClassFile = Inflector::underscore($eventClassName);			
-			$class = explode('_', $eventClassFile);
-					
-			switch ($type) {
-				case 'app':
-					if (in_array('controller', $class)) {
-						$eventClassPath = EVENTS . 'controllers' . DS . $eventClassFile . '.php';
-					} else {
-						$eventClassPath = EVENTS . 'models' . DS . $eventClassFile . '.php';
-					}
-					break;
-							
-				case 'plugin':
-					if (in_array('controller', $class)) {
-						$eventClassPath = PLUGINS . $plugin . DS . EVENTS_DIR .DS.'controllers'.DS. $eventClassFile . '.php';
-					} else {
-						$eventClassPath = PLUGINS . $plugin . DS . EVENTS_DIR .DS.'models'.DS. $eventClassFile . '.php';
-					}
-					break;
-			}
-			
-			$classPaths[$eventClassName] = $eventClassPath;
-			Cache::write('event_class_paths', $classPaths);			
+		if ($plugin) { // disabled unless i find out how to create a fallback class at runtime
+			# App::import('File', PLUGINS. $plugin .DS. $plugin . '_app_controller_events.php');
+			# App::import('File', PLUGINS. $plugin .DS. $plugin . '_app_model_events.php');		
 		}
-				
-		if (!is_file($eventClassPath)) {
-			$this->notFound[] = $eventClassPath;
-			return false;
-		}
-		
-		if (class_exists($eventClassName)) {
-			return $this->listeners[$eventClassName][2];
-		}
-		
-		if ($plugin) { 
-			App::import('File', PLUGINS. $plugin .DS. $plugin . '_app_controller_events.php');
-			App::import('File', PLUGINS. $plugin .DS. $plugin . '_app_model_events.php');		
-		}
-		
-		require_once ($eventClassPath);
 		
 		$listener = new $eventClassName($eventClassName, array(
 			'type' => $type,
-			'plugin' => $plugin,
-			'file' => str_replace(APP, '', $eventClassPath),
+			'plugin' => $plugin
 		));
 		
 		if ($this->EventDispatcher->addListener($listener)) {
@@ -169,13 +179,4 @@ class CakeEvents extends Object {
 		return $this->listeners;
 	}
 	
-	/**
-	 * Getter: $notFound
-	 *
-	 * @return unknown
-	 */	
-	public function getNotFound() {
-		
-		return $this->notFound;
-	}	
 }

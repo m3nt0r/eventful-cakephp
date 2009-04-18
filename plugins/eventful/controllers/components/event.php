@@ -28,6 +28,8 @@ class EventComponent extends Object {
 	 */
 	public $Listener = false;
 	
+	public $listeners = array();
+	
 	/**
 	 * On every controller startup
 	 *
@@ -36,14 +38,13 @@ class EventComponent extends Object {
 	public function initialize(&$controller, $settings) {
 		App::import('Vendor', 'Eventful.Startup'); // bootstrap
 		
-		$listenerType = $controller->plugin ? 'plugin' : 'app';
-		$listenerClass = Inflector::camelize($controller->name . '_controller_events');
-		
-		$this->CakeEvents = CakeEvents::getInstance();
-		$this->listenerClass = $listenerClass;
-		$this->Listener = $this->CakeEvents->addListener($listenerClass, $listenerType, $controller->plugin);
-		
 		$this->Controller = $controller;
+		$this->CakeEvents = CakeEvents::getInstance();		
+		
+		$listeners = $this->CakeEvents->loadListeners('controllers');		
+		foreach ($listeners as $class => $params) { extract($params);			
+			$this->listeners[$class] = $this->CakeEvents->addListener($className, $eventType, $pluginDir);
+		}
 	}
 	
 	/**
@@ -51,9 +52,11 @@ class EventComponent extends Object {
 	 *
 	 * @param string $event Name of the event
 	 * @param array $data Any data to attach
+	 * @param boolean $global If true, all possible listeners are notified
+	 * 
 	 * @return mixed FALSE -or- assoc result array
 	 */
-	public function dispatch($event, $data = array()) {
+	public function dispatch($event, $data = array(), $global = true) {
 		$return = array();
 		
 		// Set controller reference
