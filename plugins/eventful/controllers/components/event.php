@@ -50,11 +50,10 @@ class EventComponent extends Object {
 	 *
 	 * @param string $event Name of the event
 	 * @param array $data Any data to attach
-	 * @param boolean $global If true, all possible listeners are notified
 	 * 
 	 * @return mixed FALSE -or- assoc result array
 	 */
-	public function dispatch($event, $data = array(), $global = true) {
+	public function dispatch($event, $data = array()) {
 		$return = array();
 		
 		// Set controller reference
