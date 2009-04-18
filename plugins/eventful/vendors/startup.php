@@ -12,49 +12,44 @@
  * @version $Id$
  */
 
-/**
- * Eventful Bootstrap
- * 
- * @package eventful
- * @subpackage scripts
- */
-if (!defined('EVENTS_DIR')) {
-	define('EVENTS_DIR', 'events');
-}
-if (!defined('EVENTS')) {
-	define('EVENTS', APP . EVENTS_DIR . DS);
-}
-if (!defined('PLUGINS')) {
-	define('PLUGINS', APP . 'plugins' . DS);
-}
+if (!class_exists('CakeEvents')) {
 
-// Libraries
-App::import('Vendor', 'Eventful.Event');
-App::import('Vendor', 'Eventful.EventDispatcher');
-App::import('Vendor', 'Eventful.CakeEvents');
-App::import('Vendor', 'Eventful.AppEvents');
+	if (!defined('EVENTS_DIR')) {
+		define('EVENTS_DIR', 'events');
+	}
+	if (!defined('EVENTS')) {
+		define('EVENTS', APP . EVENTS_DIR . DS);
+	}
+	if (!defined('PLUGINS')) {
+		define('PLUGINS', APP . 'plugins' . DS);
+	}
 
-// Register EventDispatcher
-ClassRegistry::addObject('event_dispatcher', new EventDispatcher());
+	// Libraries
+	App::import('Vendor', 'Eventful.Event');
+	App::import('Vendor', 'Eventful.EventDispatcher');
+	App::import('Vendor', 'Eventful.CakeEvents');
+	App::import('Vendor', 'Eventful.AppEvents');
 
-// Base Classes
-App::import('Vendor', 'Eventful.ControllerEvents');
-App::import('Vendor', 'Eventful.ModelEvents');
+	// Register EventDispatcher
+	ClassRegistry::addObject('event_dispatcher', new EventDispatcher());
 
-// Lookup app folder for custom base classes
-App::import('File', APP . 'app_model_events.php');
-App::import('File', APP . 'app_controller_events.php');
+	// Base Classes
+	App::import('Vendor', 'Eventful.ControllerEvents');
+	App::import('Vendor', 'Eventful.ModelEvents');
 
-// Define default custom base classes if none available
-if (!class_exists('AppControllerEvents')) {
-	class AppControllerEvents extends ControllerEvents {
-		var $name = 'AppControllerEvents';
+	// Lookup app folder for custom base classes
+	App::import('File', APP . 'app_model_events.php');
+	App::import('File', APP . 'app_controller_events.php');
+
+	// Define default custom base classes if none available
+	if (!class_exists('AppControllerEvents')) {
+		class AppControllerEvents extends ControllerEvents {
+			var $name = 'AppControllerEvents';
+		}
+	}
+	if (!class_exists('AppModelEvents')) {
+		class AppModelEvents extends ModelEvents {
+			var $name = 'AppModelEvents';
+		}
 	}
 }
-if (!class_exists('AppModelEvents')) {
-	class AppModelEvents extends ModelEvents {
-		var $name = 'AppModelEvents';
-	}
-}
-
-

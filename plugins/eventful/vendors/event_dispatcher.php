@@ -16,8 +16,8 @@
 /**
  * Event Dispatcher
  * 
- * @package core
- * @subpackage core.libs
+ * @package eventful
+ * @subpackage libs
  */
 class EventDispatcher {
 	

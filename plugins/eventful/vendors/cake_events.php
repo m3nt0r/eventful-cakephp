@@ -30,19 +30,11 @@ class CakeEvents extends Object {
 	private $listeners = array();
 	
 	/**
-	 * List of not existing event class filepaths
-	 *
-	 * @var unknown_type
-	 */
-	private $notFound = array();
-	
-	/**
 	 * Singleton Class
 	 *
 	 * @return object
 	 */
 	function &getInstance() {
-		
 		static $instance = array();
 		if (!$instance) {
 			$instance[0] =& new CakeEvents();
@@ -52,10 +44,24 @@ class CakeEvents extends Object {
 		return $instance[0];
 	}
 	
+	/**
+	 * Convert a filename to a class name
+	 *
+	 * @param string $filename Any PHP file following the conventions
+	 * @return string Camelcased class name
+	 */
 	public static function file2class($filename) {
 		return Inflector::camelize(r('.php', '', $filename));
 	}
 	
+	/**
+	 * Find and prepare all possible listener classes.
+	 * Returns a array with classname as key and addListener parameters array as value
+	 *
+	 * @see CakeEvents::eventFilePaths()
+	 * @param string $dir Currently: 'controllers' and 'models'
+	 * @return array Available Listeners 
+	 */
 	public function loadListeners($dir = 'controllers') {
 		$loadable = array();
 		$filePaths = $this->eventFilePaths($dir);
@@ -83,7 +89,13 @@ class CakeEvents extends Object {
 		return $loadable;
 	}
 	
-	
+	/**
+	 * Walk through all directories and search for listener classes
+	 * Returns a array with classname as key and full path as value 
+	 *
+	 * @param string $dir Currently: 'controllers' and 'models'
+	 * @return array
+	 */
 	public function eventFilePaths($dir = 'controllers') {
 		App::import('Core', 'Folder'); 
 		
@@ -113,7 +125,6 @@ class CakeEvents extends Object {
 		return $eventFilePaths;
 	}
 	
-		
 	/**
 	 * Load and add a listener
 	 *
@@ -184,17 +195,6 @@ class CakeEvents extends Object {
 	 * @return unknown
 	 */
 	public function getListeners() {
-		
 		return $this->listeners;
 	}
-	
-	/**
-	 * Getter: $notFound
-	 *
-	 * @return unknown
-	 */	
-	public function getNotFound() {
-		
-		return $this->notFound;
-	}	
 }
