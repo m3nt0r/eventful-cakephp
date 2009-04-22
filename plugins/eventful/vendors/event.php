@@ -18,13 +18,15 @@
 /**
  * Event Object
  *
- * @package core
- * @subpackage core.libs
+ * @package eventful
+ * @subpackage libs
  */
 class Event {
 	
 	/**
 	 * Contains assigned values
+	 *
+	 * @var array
 	 */
 	protected $values = array();
 	
