@@ -30,11 +30,11 @@ class ControllerEvents extends AppEvents {
 	/*
 	 * renderElement
 	 * 	
-   * This allows you to render Elements from a handler method 
-   * within the scope of the current controller
-   * 
-   * @param string $element Name of the element
-   * @param array $data Any data you want to pass as variable
+	 * This allows you to render Elements from a handler method 
+	 * within the scope of the current controller
+	 * 
+	 * @param string $element Name of the element
+	 * @param array $data Any data you want to pass as variable
 	 */
 	protected function renderElement($element, $data = array()) {
 		$view = new View(ClassRegistry::getObject('EventController'), false);
