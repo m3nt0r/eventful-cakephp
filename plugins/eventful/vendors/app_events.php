@@ -24,11 +24,4 @@ class AppEvents extends Object
 		$this->name = $name;
 		$this->params = $params;
 	}
-	
-	function renderElement($element, $data = array()) {
-		$view = new View(ClassRegistry::getObject('EventController'), false);
-		$view->set('data', $data);
-		$html = $view->element($element, $this->params, true);		
-		$view = null; unset($view); return $html;
-	}
 }
