@@ -110,7 +110,7 @@ class CakeEvents extends Object {
 
 		// Lookup APP events
 		$events = new Folder(EVENTS . $dir);
-		list($folders, $files) = $events->ls();
+		list($folders, $files) = $events->read();
 		foreach ($files as $listenerClassFile) {
 		  $extension = substr($listenerClassFile, strrpos($listenerClassFile, '.') +1);
       if (!in_array($extension, $this->ignore)) {
@@ -120,13 +120,13 @@ class CakeEvents extends Object {
 
 		// Lookup PLUGIN events
 		$plugins = new Folder(PLUGINS);
-		list($folders, $files) = $plugins->ls();
+		list($folders, $files) = $plugins->read();
 		if (count($folders) > 1) {
 			foreach ($folders as $pluginsFolder) {
 				if ($pluginsFolder == 'eventful') continue;
 
 				$pluginEvents = new Folder(PLUGINS . $pluginsFolder . DS . EVENTS_DIR . DS . $dir);
-				list($folders, $files) = $pluginEvents->ls();
+				list($folders, $files) = $pluginEvents->read();
 
 				foreach ($files as $listenerClassFile)
 					$eventFilePaths[self::file2class($listenerClassFile)] = $pluginEvents->path . DS . $listenerClassFile;
