@@ -36,6 +36,7 @@ if (!class_exists('CakeEvents')) {
 	// Base Classes
 	App::import('Vendor', 'Eventful.ControllerEvents');
 	App::import('Vendor', 'Eventful.ModelEvents');
+	App::import('Vendor', 'Eventful.ShellEvents');
 
 	// Lookup app folder for custom base classes
 	App::import('File', APP . 'app_model_events.php');
