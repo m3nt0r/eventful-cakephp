@@ -39,8 +39,9 @@ if (!class_exists('CakeEvents')) {
 	App::import('Vendor', 'Eventful.ShellEvents');
 
 	// Lookup app folder for custom base classes
-	App::import('File', APP . 'app_model_events.php');
-	App::import('File', APP . 'app_controller_events.php');
+	App::import('File','AppModelEvents',false,array(), APP . 'app_model_events.php');	
+	App::import('File','AppControllerEvents',false,array(), APP . 'app_controller_events.php');	
+	App::import('File','AppShellEvents',false,array(), APP . 'app_shell_events.php');	
 
 	// Define default custom base classes if none available
 	if (!class_exists('AppControllerEvents')) {
@@ -51,6 +52,11 @@ if (!class_exists('CakeEvents')) {
 	if (!class_exists('AppModelEvents')) {
 		class AppModelEvents extends ModelEvents {
 			var $name = 'AppModelEvents';
+		}
+	}
+	if (!class_exists('AppShellEvents')) {
+		class AppShellEvents extends ModelEvents {
+			var $name = 'AppShellEvents';
 		}
 	}
 }
