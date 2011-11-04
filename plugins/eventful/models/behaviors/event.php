@@ -70,6 +70,20 @@ class EventBehavior extends ModelBehavior {
 		$cake_events = CakeEvents::getInstance();
 		return $cake_events->dispatchEvent($event, am($data, array('Model' => $model)));
 	}
+	
+	/**
+	 * Alias for dispatchEvent to be consistent with dispatching events
+	 * @param object $model
+	 * @param string $event
+	 * @param array $data (optional)
+	 * @access public
+	 * @see dispatchEvent method
+	 * 
+	 * @access public
+	 */
+	function dispatch($model, $event, $data = array()){
+	  return $this->dispatchEvent($model, $event, $data);
+	}
 
 	/**
 	 * Before find callback
