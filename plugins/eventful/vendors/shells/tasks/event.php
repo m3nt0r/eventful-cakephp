@@ -6,10 +6,20 @@
  * @author Gustavo Dutra <mechamo@gustavodutra.com> 
  * @package eventful
  * @subpackage shells
+ * @modifiedby    $LastChangedBy$
+ * @lastmodified  $Date: 2011-11-04 16:00:58 $
  */
 
  /**
   * EventTask
+  * 
+  * Usage:
+  * 
+  * In your shell add:
+  * public $tasks = array('Event');
+  * 
+  * Currently Cake finds the Tasks without prefixing the plugin name. In the future
+  * the above might need to be specified as array('Eventful.Event').
   */
 class EventTask extends Shell {
 

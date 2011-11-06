@@ -147,6 +147,8 @@ class CakeEvents extends Object {
 	public function addListener($eventClassName, $type = 'app', $plugin = '') {
 
 		if ($type == 'plugin' && empty($plugin)) return false;
+		
+		if ($eventClassName == 'Empty') return false;  //Catch if eventClass is passed as "Empty" when nothing was configured. Was resulting in "Class 'Empty' not found" was the fatal error message.
 
 		if ($plugin) { // disabled unless i find out how to create a fallback class at runtime
 			# App::import('File', PLUGINS. $plugin .DS. $plugin . '_app_controller_events.php');
