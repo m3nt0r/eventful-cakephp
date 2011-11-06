@@ -4,10 +4,11 @@ Event System for CakePHP
 
 Installation:
 ----------------------------------------------------------------------------------------
-- Put "events" to APP
-- Put "plugins/eventful" to APP.PLUGINS
-- Add "Eventful.Event" to AppController::$components <- ControllerEvents, Bootstrap
+- Put "events" to APP folder
+- Put "plugins/eventful" to APP.PLUGINS folder.
+- Add "Eventful.Event" to AppController::$components array <- ControllerEvents, Bootstrap
 - Optional: Add "Eventful.Event" to AppModel::$actsAs array <- ModelEvents
+- Optional: Add "Event" to shell $tasks array: $tasks = array('Event');
 - Optional: Copy "/app/events" layout into your plugin to dispatch events to plugins
 
 Current Version:
@@ -16,118 +17,168 @@ Current Version:
 
 How to use:
 ----------------------------------------------------------------------------------------
-Listener classes need to have the same name as the controller file + "_events" at
-the end. So if you want to write event handlers for "movies_controller.php" you need 
-to create a file called "movies_controller_events.php" in the folder /app/events/controllers/.
-Same goes for models. The matching "user.php" event class filename is "user_events.php".
-
-Since it all follows the cake conventions event listener classes within plugins need to 
-prefix the plugin name. If you have a "pizza" plugin the name for a controller event 
-listener class should be: "pizza_orders_controller_events.php"
-
-Note: Just because you are dispatching events from one controller it is not required 
-that the listener class file exists.  
-
-Withing the listener classes you need to prefix your event handler methods with 
-the "on" keyword. If you dispatch a event called "userSignUp" like so:
-
-<?php 
-	$this->Event->dispatch('userSignUp') 
-?>
-
-The method within the class needs to be named "onUserSignUp". More specific:
-
-<?php
-	// users_controller_events.php
-	class UsersControllerEvents extends AppControllerEvents {
+	Listener classes need to have the same name as the controller file + "_events" at
+	the end. So if you want to write event handlers for "movies_controller.php" you need 
+	to create a file called "movies_controller_events.php" in the folder /app/events/controllers/.
+	Same goes for models. The matching "user.php" event class filename is "user_events.php".
 	
-		function onUserSignUp($event) { 
-			// ... do stuff.
-		}	
-	}
-?>
+	Using the event listener classes within plugins requires that you name the files following
+	CakePHP conventions by prefixing the plugin name. For example, if you have a "pizza" plugin 
+	the name for a controller event listener class should be: "pizza_orders_controller_events.php"
 
-As you can see, we extend the AppControllerEvents class. This class is of same 
-nature as the app_controller.php. It is the default base class for all events. 
-We also have AppModelEvents for model events.
-
-You can overwrite the AppControllerEvents class by creating the file
-"app_controller_events.php" in the APP folder. Same spot as app_helper.php, etc.
-But that's optional... a good place for shared events.
-
-About the "$event" parameter. Passed to all handlers by default. If the event 
-is a controller event you can access the controller object at $event->Controller.
-If the event is a model event you can access the model at $event->Model.
-
-There is also a optional $data parameter in the EventComponent dispatch method.
-
-<?php
-	$this->Event->dispatch('userSignUp', array('hello' => 'kitty'));
-?>
-
-The event handler method can access the value of "hello" at the event object
-
-<?php
-	class UsersControllerEvents extends AppControllerEvents {
+Dispatching events: 
+	To dispatch events in controllers or shells:
 	
-		function onUserSignUp($event) {
-			return $event->hello; //=> kitty
+	<?php 
+		$this->Event->dispatch('userSignUp') 
+	?>
+	
+	To dispatch events in models:
+	<?php 
+		$this->dispatch('userSignUp') 
+	?>
+	
+	Calling the dispatch method does not require that the dispatch event code exist. You can add
+	dispatch events in your application and later develop the code to handle the events.
+
+Writing event code:
+	In your listener class file, you define your event methods by prefixing the "on" keyword:
+	
+	<?php
+		// users_controller_events.php
+		class UsersControllerEvents extends AppControllerEvents {
+		
+			function onUserSignUp($event) { 
+				// ... do stuff.
+			}	
 		}
-	}
-?>
+	?>
+	
+	You can listen for events across multiple listener classes. You can also catch an event to 
+	in your users_model_events.php file:
+	<?php
+		// users_model_events.php
+		class UsersModelEvents extends AppModelEvents {
+		
+			function onUserSignUp($event) { 
+				// ... do different stuff
+			}	
+		}
+	?>
+	
+	This allows for flexibility in your code and to maintain a degree of MVC architecture in 
+	your code logic. For example, you might trigger an email in the controller event and update a record
+	in the model event.
+
+Base classes:
+
+	As you can see, we extend the AppControllerEvents class. This class is of same 
+	nature as the app_controller.php. It is the default base class for all events. 
+	We also have AppModelEvents for model events.
+	
+	You can overwrite the AppControllerEvents class by creating the file
+	"app_controller_events.php" in the APP folder. Same spot as app_helper.php, etc.
+	But that's optional... a good place for shared events.
+
+Event method Parameters:
+----------------------------------------------------------------------------------------
+
+	The $event object is passed to all handlers by default. If the event 
+	is a controller event, you can access the controller object at $event->Controller. If the 
+	event is a model event, you can access the model at $event->Model. If the event is a shell
+	event, you can access the shell at $event->Dispatcher.
+
+
+Passing data to your event code:
+	You can specify a second $data parameter in the EventComponent dispatch method and pass
+	an array that contains any information your event might require.
+	
+	<?php
+		$this->Event->dispatch('userSignUp', array('hello' => 'kitty'));
+	?>
+	
+	The event handler method can access the value of "hello" at the event object
+	
+	<?php
+		class UsersControllerEvents extends AppControllerEvents {
+		
+			function onUserSignUp($event) {
+				return $event->hello; //=> kitty
+			}
+		}
+	?>
 
 Trigger all Events
 ----------------------------------------------------------------------------------------
-If you specify the same event listener method in other listener classes the event dispatch
-will fire them too.
-
-Fire -> "usersIndex" in any controller
-Execs -> *.*ControllerEvents::onUsersIndex()
-
-Be careful about how you name the events.
-
-Check out this output: 
-
-Array
-(
-    [MoviesControllerEvents] => I am the MoviesController Event Listener!
-    [UsersControllerEvents] => I am the UsersController Event Listener!
-    [PizzaMoviesControllerEvents] => I am the Pizza.MoviesController Event Listener!
-)
-
-This array is the default return format from the dispatch method. 
-That way you can sort the returns from all events as you need them
-
-To get the above in my example application i wrote in my action:
-
-function index() {
-  $result = $this->Event->dispatch('usersIndex');
-  pr ($result);
-}
+	If you specify the same event listener method in other listener classes the event dispatch
+	will fire them too.
+	
+	Fire -> "usersIndex" in any controller
+	Execs -> *.*ControllerEvents::onUsersIndex()
+	
+	Be careful about how you name the events.
+	
+	Check out this output: 
+	
+	Array
+	(
+	    [MoviesControllerEvents] => I am the MoviesController Event Listener!
+	    [UsersControllerEvents] => I am the UsersController Event Listener!
+	    [PizzaMoviesControllerEvents] => I am the Pizza.MoviesController Event Listener!
+	)
+	
+	This array is the default return format from the dispatch method. 
+	That way you can sort the returns from all events as you need them
+	
+	To get the above in my example application i wrote in my action:
+	
+	function index() {
+	  $result = $this->Event->dispatch('usersIndex');
+	  pr ($result);
+	}
 
 Model Events:
 --------------------------------------------------------------------------------------
-Basicly everything from above applies. Filename for user.php would be user_events.php.
-There are default events that are fired from within the behavior. 
+	Basicly everything from above applies. Filename for user.php would be user_events.php.
+	There are default events that are fired from within the behavior. 
+	
+	- onBeforeFind (available infos: 'query')
+	- onAfterFind (available infos: 'results', 'primary');
+	- onBeforeValidate (available infos: )
+	- onBeforeSave (available infos: )
+	- onAfterSave (available infos: 'created')
+	- onBeforeDelete (available infos: 'cascade')
+	- onAfterDelete (available infos: 'created')
+	- onDatasourceError (available infos: 'error')
+	
+	The triggering of the default events can be disabled. 
+	
+	var $actsAs = array(
+	  'Eventful.Event' => array(
+			'triggerDefaults' => false
+		)
+	);
 
-- onBeforeFind (available infos: 'query')
-- onAfterFind (available infos: 'results', 'primary');
-- onBeforeValidate (available infos: )
-- onBeforeSave (available infos: )
-- onAfterSave (available infos: 'created')
-- onBeforeDelete (available infos: 'cascade')
-- onAfterDelete (available infos: 'created')
-- onDatasourceError (available infos: 'error')
-
-The triggering of the default events can be disabled. 
-
-var $actsAs = array(
-  'Eventful.Event' => array(
-		'triggerDefaults' => false
-	)
-);
-
-Everything else is up to you.
+Some additional help for writing event code:
+----------------------------------------------------------------------------------------
+	One of the common scenarios for event driven programming is triggering automatic emails
+	when a condition occurs. If you need to send email from an event, you can import the 
+	Email component in the following manner:
+	
+	<?php
+		function onUserSignUp($event){
+			App::import('Component', 'Email');
+	    $email = new EmailComponent();
+	    $email->startup($controller);
+	    $email->to = $event->userEmail;
+	    //additional email logic
+	    $email->send($body);
+		}
+	?>
+	You might consider adding similar a "sendMail" method to your config/bootstrap.php 
+	instead if you find you need to send emails from a variety of locations outside of 
+	controller classes. In that case you would be able to call sendMail($params...); 
+	anywhere in your application.
 
 --------------------------------------------------------------------------------------
 
