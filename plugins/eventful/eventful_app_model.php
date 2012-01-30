@@ -9,6 +9,6 @@
  * @subpackage plugin
  * @version $Id$
  */
-class EventfulAppModel extends AppController {
+class EventfulAppModel extends AppModel {
 	
 }
