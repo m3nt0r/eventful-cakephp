@@ -2,19 +2,19 @@
 /**
  * Eventful CakePHP
  * 
- * EventDispatcher Class. Manages and calls
- * all registered EventListeners and Handlers 
- * 
- * @author Kjell Bublitz <kjell@growinthings.de>
- * @copyright 2008-2009 (c) Kjell Bublitz
- * @link http://cakealot.com
+ * @author Kjell Bublitz <m3nt0r.de@gmail.com>
+ * @copyright 2008-2013 (c) Kjell Bublitz
+ * @link https://github.com/m3nt0r/eventful-cakephp
+ * @link https://github.com/m3nt0r
  * @package eventful
  * @subpackage libs
  * @version $Id$
  */
 
 /**
- * Event Dispatcher
+ * Event Object
+ *
+ * Manages and triggers all registered EventListeners and Handlers 
  * 
  * @package eventful
  * @subpackage libs

@@ -1,15 +1,11 @@
 <?php
 /**
  * Eventful CakePHP
- *
- * Event Object Class. An instance of this class 
- * is passed to the event handler as first argument.
- * Possibly contains data from the dispatched event
- * for use in the handler methods.
  * 
- * @author Kjell Bublitz <kjell@growinthings.de>
- * @copyright 2008-2009 (c) Kjell Bublitz
- * @link http://cakealot.com
+ * @author Kjell Bublitz <m3nt0r.de@gmail.com>
+ * @copyright 2008-2013 (c) Kjell Bublitz
+ * @link https://github.com/m3nt0r/eventful-cakephp
+ * @link https://github.com/m3nt0r
  * @package eventful
  * @subpackage libs
  * @version $Id$
@@ -18,6 +14,9 @@
 /**
  * Event Object
  *
+ * An instance of this class is passed to the event handler as first argument.
+ * Possibly contains data from the dispatched event for use in the handler methods.
+ * 
  * @package eventful
  * @subpackage libs
  */

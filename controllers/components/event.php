@@ -2,11 +2,10 @@
 /**
  * Eventful CakePHP
  * 
- * Component to access the controller event system.
- * 
- * @author Kjell Bublitz <kjell@growinthings.de>
- * @copyright 2008-2009 (c) Kjell Bublitz
- * @link http://cakealot.com
+ * @author Kjell Bublitz <m3nt0r.de@gmail.com>
+ * @copyright 2008-2013 (c) Kjell Bublitz
+ * @link https://github.com/m3nt0r/eventful-cakephp
+ * @link https://github.com/m3nt0r
  * @package eventful
  * @subpackage components
  * @version $Id$
@@ -15,6 +14,7 @@
 /**
  * EventComponent
  * 
+ * Trigger controller_events via `$this->Event->dispatch()`
  * 
  * @package eventful
  * @subpackage components

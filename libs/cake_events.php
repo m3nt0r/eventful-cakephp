@@ -1,21 +1,20 @@
 <?php
 /**
  * Eventful CakePHP
- *
- * Cake Events Class. Singleton, loading listener classes
- * by classname and manage/cache paths, etc..
- *
- * @author Kjell Bublitz <kjell@growinthings.de>
- * @copyright 2008-2009 (c) Kjell Bublitz
- * @link http://cakealot.com
+ * 
+ * @author Kjell Bublitz <m3nt0r.de@gmail.com>
+ * @copyright 2008-2013 (c) Kjell Bublitz
+ * @link https://github.com/m3nt0r/eventful-cakephp
+ * @link https://github.com/m3nt0r
  * @package eventful
  * @subpackage libs
  * @version $Id$
  */
 
 /**
- * CakeEvents.
- * EventDispatcher Wrapper
+ * CakeEvents
+ *
+ * Singleton responsible for loading listener classes by classname and to manage/cache paths
  *
  * @package eventful
  * @subpackage libs
@@ -107,32 +106,25 @@ class CakeEvents extends Object {
 		App::import('Core', 'Folder');
 
 		$eventFilePaths = array();
-
-		// Lookup APP events
-		$events = new Folder(EVENTS . $dir);
+		
+		// get controller-type event handler filepaths
+		$events = new Folder(APP.'controllers');
 		list($folders, $files) = $events->read();
 		foreach ($files as $listenerClassFile) {
-		  $extension = substr($listenerClassFile, strrpos($listenerClassFile, '.') +1);
-      if (!in_array($extension, $this->ignore)) {
-			  $eventFilePaths[self::file2class($listenerClassFile)] = $events->path . DS . $listenerClassFile;
-			}
-    }
-
-		// Lookup PLUGIN events
-		$plugins = new Folder(PLUGINS);
-		list($folders, $files) = $plugins->read();
-		if (count($folders) > 1) {
-			foreach ($folders as $pluginsFolder) {
-				if ($pluginsFolder == 'eventful') continue;
-
-				$pluginEvents = new Folder(PLUGINS . $pluginsFolder . DS . EVENTS_DIR . DS . $dir);
-				list($folders, $files) = $pluginEvents->read();
-
-				foreach ($files as $listenerClassFile)
-					$eventFilePaths[self::file2class($listenerClassFile)] = $pluginEvents->path . DS . $listenerClassFile;
+			if (array_pop(explode('_', $listenerClassFile)) === 'events.php') {
+				$eventFilePaths[self::file2class($listenerClassFile)] = $events->path . DS . $listenerClassFile;
 			}
 		}
-
+		
+		// get model-type event handler filepaths
+		$events = new Folder(APP.'models');
+		list($folders, $files) = $events->read();
+		foreach ($files as $listenerClassFile) {
+			if (array_pop(explode('_', $listenerClassFile)) === 'events.php') {
+				$eventFilePaths[self::file2class($listenerClassFile)] = $events->path . DS . $listenerClassFile;
+			}
+		}
+		
 		return $eventFilePaths;
 	}
 
@@ -145,16 +137,11 @@ class CakeEvents extends Object {
 	 * @return mixed false if unsuccessful or an array with params
 	 */
 	public function addListener($eventClassName, $type = 'app', $plugin = '') {
-
+		
 		if ($type == 'plugin' && empty($plugin)) return false;
 		
 		if ($eventClassName == 'Empty') return false;  //Catch if eventClass is passed as "Empty" when nothing was configured. Was resulting in "Class 'Empty' not found" was the fatal error message.
-
-		if ($plugin) { // disabled unless i find out how to create a fallback class at runtime
-			# App::import('File', PLUGINS. $plugin .DS. $plugin . '_app_controller_events.php');
-			# App::import('File', PLUGINS. $plugin .DS. $plugin . '_app_model_events.php');
-		}
-
+		
 		if (in_array($eventClassName, array_keys($this->listeners))) {
 			return $this->listeners[$eventClassName][2];
 		}
@@ -165,7 +152,7 @@ class CakeEvents extends Object {
 			$this->listeners[$listener->name] = array($listener, $listener->name, $listener->params);
 			return $listener->params;
 		}
-
+		
 		return false;
 	}
 
@@ -180,14 +167,14 @@ class CakeEvents extends Object {
 		return $this->EventDispatcher->dispatchEvent(new Event($name, $data), $global);
 	}
 
-    /**
-     * Unregister a class listener
-     *
-     * Unregisters a class listener. Each method of this instance that matches "on[event]" will be
-     * registered for the corresponding event. See "addListener" method for more details on this.
-     *
-     * @param object listener the listener to be unregistered
-     */
+	/**
+	 * Unregister a class listener
+	 *
+	 * Unregisters a class listener. Each method of this instance that matches "on[event]" will be
+	 * registered for the corresponding event. See "addListener" method for more details on this.
+	 *
+	 * @param object listener the listener to be unregistered
+	 */
 	public function removeListener($listener) {
 		return $this->EventDispatcher->removeListener($listener);
 	}
@@ -211,3 +198,6 @@ class CakeEvents extends Object {
 		return $this->listeners;
 	}
 }
+
+require_once 'cake_events/event.php';
+require_once 'cake_events/dispatcher.php';

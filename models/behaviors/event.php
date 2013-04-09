@@ -1,22 +1,23 @@
 <?php
 /**
  * Eventful CakePHP
- *
- * Use the dispatch() method
- *
- * OPTIONS:
- * - triggerDefaults: (BOOL) Auto-dispatch beforeSave/afterDelete/beforeFind etc..
  * 
- * @author Kjell Bublitz <kjell@growinthings.de>
- * @copyright 2008-2009 (c) Kjell Bublitz
- * @link http://cakealot.com
+ * @author Kjell Bublitz <m3nt0r.de@gmail.com>
+ * @copyright 2008-2013 (c) Kjell Bublitz
+ * @link https://github.com/m3nt0r/eventful-cakephp
+ * @link https://github.com/m3nt0r
  * @package eventful
  * @subpackage behaviors
  * @version $Id$
  */
 
 /**
- * Event Behavior
+ * Model Behavior
+ * 
+ * Use the dispatch() method to trigger one or more model_events
+ * 
+ * Bevavior Options
+ * - 'triggerDefaults': (BOOL) Auto-dispatch the default beforeSave/afterDelete/beforeFind callbacks..
  * 
  * @package eventful
  * @subpackage behaviors
@@ -72,7 +73,8 @@ class EventBehavior extends ModelBehavior {
 	}
 	
 	/**
-	 * Alias for dispatchEvent to be consistent with dispatching events
+	 * Alias for dispatchEvent to be consistent with other APIs
+	 *
 	 * @param object $model
 	 * @param string $event
 	 * @param array $data (optional)

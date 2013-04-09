@@ -2,21 +2,20 @@
 /**
  * Eventful CakePHP
  * 
- * Controller Events. Extend App*Events from this
- * 
- * @author Kjell Bublitz <kjell@growinthings.de>
- * @copyright 2008-2009 (c) Kjell Bublitz
- * @link http://cakealot.com
+ * @author Kjell Bublitz <m3nt0r.de@gmail.com>
+ * @copyright 2008-2013 (c) Kjell Bublitz
+ * @link https://github.com/m3nt0r/eventful-cakephp
+ * @link https://github.com/m3nt0r
  * @package eventful
- * @subpackage app
+ * @subpackage libs
  * @version $Id$
  */
 
 /**
- * ControllerEvents
+ * ModelEvents
  * 
  * @package eventful
- * @subpackage app
+ * @subpackage app_events
  */
 class ControllerEvents extends AppEvents {
 	
